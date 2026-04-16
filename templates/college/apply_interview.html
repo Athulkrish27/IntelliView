@@ -1,0 +1,197 @@
+
+
+{% extends 'college/college_head.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+
+.upload-box {
+    width: 300px;
+    height: 300px;
+    border: 2px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.upload-box img {
+    max-width: 50%;
+    max-height: 50%;
+    display: none;
+}
+.file-input-container {
+    margin-top: 2px;
+}
+.image_input {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+</style>
+
+    <!-- Contact Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="section-title bg-white text-center text-primary px-3">Join us</h6>
+                <h1 class="mb-5">Application form</h1>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <h5>Get In Touch</h5>
+                    <p class="mb-4">Connect to us if you have any queries. Office time: Monday to Saturday 9 AM to 5.30 PM.</p>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="d-flex align-items-center justify-content-center flex-shrink-0 bg-primary" style="width: 50px; height: 50px;">
+                            <i class="fa fa-map-marker-alt text-white"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="text-primary">Office</h5>
+                            <p class="mb-0">Example University,Pala,Kottayam</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="d-flex align-items-center justify-content-center flex-shrink-0 bg-primary" style="width: 50px; height: 50px;">
+                            <i class="fa fa-phone-alt text-white"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="text-primary">Phone</h5>
+                            <p class="mb-0">0457 230 2450</p><p class="mb-0">9865365204</p>
+                            
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center flex-shrink-0 bg-primary" style="width: 50px; height: 50px;">
+                            <i class="fa fa-envelope-open text-white"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="text-primary">Email</h5>
+                            <p class="mb-0">info@example.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12 wow fadeInUp" data-wow-delay="0.5s">
+                    <form id="uploadForm" action="{% url 'submit_application' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required>
+                                    <label for="name">Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" name="email" value="{{email}}" readonly required>
+                                    <label for="email">Email</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="tel" class="form-control" name="phone" id="phone" placeholder="Phone Number" pattern="[0-9]{10}" maxlength="10" required>
+                                    <label for="phone">Phone Number</label>
+                                    <p style="font-size: smaller;color:rgb(69, 239, 69)">* 10 digit phone number</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="address" name="address" placeholder="Your Name" required>
+                                    <label for="name">Address</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    <input type="file" name="resume" class="form-control" id="resume" accept=".pdf" 
+                                        style="color:rgba(8, 8, 8, 0.335);background-color: rgba(251, 251, 251, 0);" required 
+                                        onchange="validateFileSize(this)">
+                                    <label for="resume">Upload Your Resume</label>
+                                    <p style="font-size: smaller;color:rgb(69, 239, 69)">* .pdf file only (Max: 2MB)</p>
+                                </div>
+                            </div>
+                            <input type="hidden" value="{{ interview_id }}" name="interview_id">
+
+                            <div class="col-12">
+                            <!-- Submit Button (Initially Disabled) -->
+
+                                <button class="btn btn-primary w-100 py-3" id="submitBtn" type="submit" disabled>Apply</button>
+                            </div>
+                        </div>
+
+                </div>
+
+                
+                <div class="col-lg-4 col-md-12 wow fadeInUp image_input" data-wow-delay="0.5s">
+                    <h6>Upload a close up image</h6>
+                        <div class="row g-3">
+                            <!-- Upload Box with Default Image -->
+                            <div class="upload-box" id="uploadBox">
+                                <img id="preview" src="{% static 'college/img/propic_outline.png' %}" alt="Image Preview">
+                            </div>
+                
+                            <!-- File Input -->
+                            <div class="file-input-container">
+                                <input type="file" id="fileInput" name="pro_pic" accept="image/*">
+                            </div>
+                
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Contact End -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Ensure base image is visible when the page loads
+    preview.src = "{% static 'college/img/propic_outline.png' %}";
+    preview.style.display = "block";  // Ensures image is visible
+
+    fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "block"; // Ensure the image is visible
+                submitBtn.disabled = false; // Enable submit button
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            // Reset to base image if no file is selected
+            preview.src = "{% static 'college/img/propic_outline.png' %}";
+            submitBtn.disabled = true;
+        }
+    });
+});
+
+function validateFileSize(input) {
+        const file = input.files[0];
+        if (file && file.size > 2 * 1024 * 1024) { // 2MB limit
+            alert("File size must be 2MB or less!");
+            input.value = ""; // Clear the input
+        }
+    }
+    
+</script>
+    
+
+{% endblock %}

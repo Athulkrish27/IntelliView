@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interview Session</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      color: #333;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      color: #002b5b;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #d32f2f;
+      margin-bottom: 1.5rem;
+    }
+
+    .question-box {
+      display: none;
+    }
+
+    .question-box.active {
+      display: block;
+    }
+
+    .question-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-prev {
+      background-color: #ccc;
+      color: #333;
+    }
+
+    .btn-next {
+      background-color: #0066cc;
+      color: white;
+    }
+
+    .submit-btn {
+      margin-top: 2rem;
+      width: 100%;
+      background-color: #28a745;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+    }
+
+    .question-counter {
+      text-align: center;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Session 3: Aswering </h1>
+    <div class="timer" id="timer">Time Left: 5:00</div>
+    <div class="question-counter" id="counter">Question 1 of 10</div>
+
+    <form id="qa-form" method="POST" action="">
+      {% csrf_token %}
+
+      {% for question in questions %}
+      <div class="question-box {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter }}">
+        <div class="question-title">{{ question.qa_q }}</div>
+        <textarea name="answer{{ forloop.counter }}" placeholder="Type your answer here..."></textarea>
+      </div>
+      {% endfor %}
+
+      <div class="nav-buttons">
+        <button type="button" class="btn btn-prev" onclick="changeQuestion(-1)">Previous</button>
+        <button type="button" class="btn btn-next" onclick="changeQuestion(1)">Next</button>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Answers</button>
+    </form>
+  </div>
+
+  <script>
+    let current = 0;
+    const boxes = document.querySelectorAll('.question-box');
+    const counter = document.getElementById('counter');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function updateDisplay() {
+      boxes.forEach((box, index) => {
+        box.classList.toggle('active', index === current);
+      });
+      counter.innerText = `Question ${current + 1} of ${boxes.length}`;
+    }
+
+    function changeQuestion(step) {
+      current += step;
+      if (current < 0) current = 0;
+      if (current >= boxes.length) current = boxes.length - 1;
+      updateDisplay();
+      checkIfAllAnswered();
+    }
+
+    function checkIfAllAnswered() {
+      const answers = document.querySelectorAll('textarea');
+      const allAnswered = Array.from(answers).every(area => area.value.trim() !== "");
+      if (allAnswered) {
+        submitBtn.style.display = 'block';
+      } else {
+        submitBtn.style.display = 'none';
+      }
+    }
+
+    // Check on input change
+    document.querySelectorAll('textarea').forEach(area => {
+      area.addEventListener('input', checkIfAllAnswered);
+    });
+
+    // Timer logic (5 mins = 300 seconds)
+    let timeLeft = 300;
+    const timerDisplay = document.getElementById('timer');
+    const form = document.getElementById('qa-form');
+
+    function updateTimer() {
+      let mins = Math.floor(timeLeft / 60);
+      let secs = timeLeft % 60;
+      timerDisplay.innerText = `Time Left: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      if (timeLeft === 0) {
+        autoSubmit();
+      } else {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      }
+    }
+
+    function autoSubmit() {
+      document.querySelectorAll('textarea').forEach(area => {
+        if (area.value.trim() === "") {
+          area.value = "None";
+        }
+      });
+      form.submit();
+    }
+
+    updateDisplay();
+    updateTimer();
+  </script>
+</body>
+</html>

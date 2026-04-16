@@ -1,0 +1,48 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelliview Session 1</title>
+    <link rel="stylesheet" href="{% static 'user_home\live_cam\styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Face Verification</h1>
+        <div class="video-container">
+            <img src="{% url 'video_feed' %}" id="video-stream" alt="Live Video Stream">
+        </div>
+        <div class="button-container">
+            <button id="capture-btn" class="btn">Capture Image</button>
+            <button id="cancel-btn" class="btn">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Handle the Capture Image button click
+        document.getElementById('capture-btn').addEventListener('click', function () {
+        fetch("{% url 'capture_image' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;  // Manual redirection
+                } else {
+                    alert(data.status);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+        // Handle the Cancel button click
+        document.getElementById('cancel-btn').addEventListener('click', function() {
+            // Stop the video stream by removing the src
+            document.getElementById('video-stream').src = '';
+
+            // Redirect to the home page
+            window.location.href = "{% url 'interview_home' %}";
+        });
+    </script>
+</body>
+</html>

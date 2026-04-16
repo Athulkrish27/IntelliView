@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interview Verification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 5rem auto;
+      padding: 2.5rem;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #002b5b;
+      margin-bottom: 1rem;
+    }
+
+    .candidate-info {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .details {
+      flex: 1;
+      min-width: 250px;
+      font-size: 1.05rem;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    .details strong {
+      color: #000;
+    }
+
+    .profile-pic {
+      flex-shrink: 0;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #0066cc;
+    }
+
+    .resume-viewer {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      height: 600px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .button-group {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .proceed-btn {
+      padding: 0.75rem 1.5rem;
+      background-color: #0066cc;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .proceed-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 102, 204, 0.3);
+    }
+
+    .cancel-btn {
+      background-color: #d9534f;
+    }
+
+    .cancel-btn:hover {
+      box-shadow: 0 6px 12px rgba(217, 83, 79, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  {% if message %}
+  <script>alert("{{message}}")</script>
+  {% endif %}
+
+  <h1>Session 1: Verification</h1>
+
+  <div class="container">
+    <h2>Your Profile</h2>
+    <div class="candidate-info">
+      <div class="details">
+        <p><strong>Name:</strong> {{ applicant.applicant_name }}</p>
+        <p><strong>Email:</strong> {{ applicant.applicant_email }}</p>
+        <p><strong>Phone:</strong> {{ applicant.applicant_phone }}</p>
+        <p><strong>Address:</strong> {{ applicant.applicant_address }}</p>
+        <p><strong>Position Applied:</strong> {{ applicant.applied_interview.interview_post }}</p>
+      </div>
+      <img src="{{ applicant.applicant_pro_pic.url }}" alt="Profile Picture" class="profile-pic">
+    </div>
+
+    <h2>Resume</h2>
+    <div class="resume-viewer">
+      <iframe src="{{ applicant.applicant_resume.url }}" title="Resume PDF"></iframe>
+    </div>
+
+    <div class="button-group">
+      <form method="POST" action="{% url 'introduce_yourself' %}">
+        {% csrf_token %}
+        <button type="submit" class="proceed-btn">That's me, continue</button>
+      </form>
+      <form method="POST" action="{% url 'face_verification' %}">
+        {% csrf_token %}
+        <button type="submit" class="proceed-btn cancel-btn">That's not me, cancel</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+{% extends 'admin/admin_head.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+  .btn-submit {
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    transition: 0.3s;
+  }
+  .btn-submit:hover {
+    background: #0056b3;
+  }
+</style>
+
+<main class="main">
+    <section id="contact" style="margin-left:20px" class="contact section">
+        <div class="container section-title" data-aos="fade-up">
+            <h2>Create Interview</h2>
+            <p>Provide proper instructions for a better interview</p>
+        </div>
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-7" style="width:100%;">
+              <form action="{% url 'create_interview' %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="title" class="form-label">Post Title</label>
+                    <input type="text" class="form-control" name="title" id="title" required placeholder="Enter job title">
+                </div>
+
+                <div class="mb-3">
+                    <label for="qualification" class="form-label">Preferred Qualification</label>
+                    <input type="text" class="form-control" name="qualification" id="qualification" required placeholder="Enter required qualification">
+                </div>
+
+                <div class="mb-3">
+                    <label for="pay_scale" class="form-label">Pay Scale</label>
+                    <input type="text" class="form-control" name="pay_scale" id="pay_scale" required placeholder="e.g. 20,000 - 30,000 / Monthly">
+                </div>
+
+                <div class="mb-3">
+                    <label for="date" class="form-label">Schedule Date & Time <span style="font-size:15px;color:red;">*Starting time is restricted from 7 Am to 5 Pm</span></label>
+                    <input type="datetime-local" class="form-control" name="date" id="date" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="syllabus" class="form-label">Syllabus</label>
+                    <input type="text" class="form-control" name="syllabus" id="syllabus" required placeholder="Topics covered in the interview">
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" name="description" id="description" rows="5" required placeholder="Provide detailed description of the interview"></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn-submit">Schedule Interview</button>
+                </div>
+
+            </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let dateInput = document.getElementById("date");
+
+    let today = new Date();
+    today.setDate(today.getDate() + 3); // Move to 3 days later
+
+    let minDate = today.toISOString().slice(0, 10); // Format YYYY-MM-DD
+    let maxTime = "T21:00"; // Latest selectable time
+    let minTime = "T07:00"; // Earliest selectable time
+
+    // Set min selectable date
+    dateInput.setAttribute("min", minDate + minTime);
+    dateInput.setAttribute("max", "9999-12-31" + maxTime); // Allow long-term scheduling
+
+    // Restrict time selection within 07:00 - 17:00 dynamically
+    dateInput.addEventListener("input", function () {
+        let selectedDateTime = new Date(dateInput.value);
+        let selectedHours = selectedDateTime.getHours();
+
+        if (selectedHours < 7) {
+            dateInput.value = dateInput.value.split("T")[0] + "T07:00";
+        } else if (selectedHours >= 17) {
+            dateInput.value = dateInput.value.split("T")[0] + "T17:00";
+        }
+    });
+});
+</script>
+
+{% endblock %}

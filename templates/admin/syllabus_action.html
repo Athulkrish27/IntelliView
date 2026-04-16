@@ -1,0 +1,349 @@
+{% extends 'admin/admin_head.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+    .custom-table-container {
+    width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.custom-table th, .custom-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.custom-table th {
+    background: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+.custom-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.custom-table tr:hover {
+    background: #e9ecef;
+}
+
+/* Document Container */
+.file-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Section */
+.file-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+/* Common Button Styles */
+.btn-custom {
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.see-btn {
+    background: #007bff;
+    color: #fff;
+}
+
+.see-btn:hover {
+    background: #0056b3;
+}
+
+.generate-btn {
+    background: #28a745;
+    color: #fff;
+}
+
+.generate-btn:hover {
+    background: #1e7e34;
+}
+
+/* Add subtle shadow on hover */
+.btn-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.file-content {
+    margin-top: 15px;
+    height: 500px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background: #f9f9f9;
+}
+
+/* Form Styling */
+.form-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+#num-questions {
+    width: 100px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+    .file-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .form-container {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    #num-questions {
+        width: 80%;
+        max-width: 200px;
+    }
+
+    .btn-custom {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table-row {
+    opacity: 0; /* Initially hide rows */
+}
+
+.scroll-container {
+        overflow: hidden;
+        white-space: nowrap;
+        width: 100%;
+        background: #f9f9f9;
+        padding: 10px 0;
+        position: relative;
+    }
+
+    .scroll-content {
+        display: flex;
+        gap: 8px;
+        animation: scrollAnimation 20s linear infinite;
+        width: max-content;
+    }
+
+    @keyframes scrollAnimation {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+
+    .card {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+        min-width: 180px;
+        flex: 0 0 auto;
+    }
+
+    .info { background: #d1ecf1; color: #0c5460; }
+    .tip { background: #d4edda; color: #155724; }
+    .warning { background: #fff3cd; color: #856404; }
+    .validate { background: #cce5ff; color: #004085; }
+    .edit { background: #f8d7da; color: #721c24; }
+    .important { background: #e2e3e5; color: #383d41; }
+
+</style>
+
+<main class="main">
+
+        <div class="container section-title" data-aos="fade-down">
+            <h2>Syllabus Questions</h2>
+            <p>Create Questions from Syllabus</p>
+        </div>
+
+        <div class="instructions">
+            <div class="scroll-container">
+                <div class="scroll-content">
+                    <div class="card info">🕒 <strong>Patience Required:</strong> Generating questions and answers takes time.</div>
+                    <div class="card tip">📈 <strong>More Questions:</strong> Increase the number of questions if needed.</div>
+                    <div class="card warning">⚠️ <strong>Duplicate Prevention:</strong> Previously saved questions will not be saved again.</div>
+                    <div class="card validate">✅ <strong>Check Accuracy:</strong> Review the generated questions and answers.</div>
+                    <div class="card edit">🛠️ <strong>Manual Edits:</strong> Correct any incorrect information.</div>
+                    <div class="card important">📌 <strong>Final Validation:</strong> Manual supervision is always recommended.</div>
+
+                    <!-- Duplicated cards for smooth looping -->
+                    <div class="card info">🕒 <strong>Patience Required:</strong> Generating questions and answers takes time.</div>
+                    <div class="card tip">📈 <strong>More Questions:</strong> Increase the number of questions if needed.</div>
+                    <div class="card warning">⚠️ <strong>Duplicate Prevention:</strong> Previously saved questions will not be saved again.</div>
+                    <div class="card validate">✅ <strong>Check Accuracy:</strong> Review the generated questions and answers.</div>
+                    <div class="card edit">🛠️ <strong>Manual Edits:</strong> Correct any incorrect information.</div>
+                    <div class="card important">📌 <strong>Final Validation:</strong> Manual supervision is always recommended.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="custom-table-container">
+            <table class="custom-table">
+                <div class="file-header">
+                    <h4><span id="file-name">Syllabus : {{ syllabus.syllabus_name }}</span></h4>
+                
+                    <button class="btn-custom see-btn" onclick="viewDocument('{{ syllabus.syllabus_file_path.url }}')">
+                        View Document
+                    </button>
+                
+                    <form id="generate-form" method="post" action="{% url 'generate_qa' %}">
+                        {% csrf_token %}
+                        <div class="form-container">
+                            <label>Number of questions: </label>
+                            <input type="number" name="num_ques" min="1" step="1" placeholder="Number" required onkeypress="return event.key != 'e' && event.key != 'E' && event.key != '+' && event.key != '-'">
+                            <input hidden name="syl_id" value="{{ syllabus.syllabus_id }}" required>
+                    
+                            <button type="submit" id="generate-btn" class="btn-custom generate-btn">
+                                Generate Question & Answer
+                            </button>
+                        </div>
+                        
+                        <!-- Loading Indicator (Hidden by Default) -->
+                        <div id="loading-message" style="display: none; text-align: center; margin-top: 15px;">
+                            <span>📝 Generating Questions & Answers... Please wait.</span>
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </form>
+                    
+                </div>
+                
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>Question</th>
+                        <th>Answer</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for qa in qa_s %}
+                    <tr class="table-row">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ qa.qa_q }}</td>
+                        <td>{{ qa.qa_a }}</td>
+                        <td>     
+                            <a href="{% url 'manage_qa' qa.qa_id %}" class="view-btn">
+                                &#9999; Edit
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; font-weight: bold; color: #888;">No data available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+    function viewDocument(fileUrl) {
+        window.open(fileUrl, "_blank"); // Opens the document in a new tab
+    }
+
+    document.getElementById("generate-form").addEventListener("submit", function () {
+        // Show the loading message
+        document.getElementById("loading-message").style.display = "block";
+
+        // Disable the submit button to prevent multiple clicks
+        document.getElementById("generate-btn").disabled = true;
+        document.getElementById("generate-btn").innerText = "Generating...";
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll(".table-row");
+
+    rows.forEach((row, index) => {
+        setTimeout(() => {
+            row.style.animation = "fadeInUp 0.5s ease-out";
+            row.style.opacity = "1";
+        }, index * 150); // Delay each row slightly
+    });
+});
+
+
+
+</script>
+
+{% endblock %}

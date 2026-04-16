@@ -1,0 +1,98 @@
+{% extends 'admin/admin_head.html' %}
+{% block content %}
+{% load static %}
+
+
+{% if messages %}
+    {% for message in messages|slice:"-1:" %}  
+        <div class="alert alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<style>
+    .custom-table-container {
+        width: 100%; /* Reduce width to create space on the sides */
+        margin: 20px auto; /* Center the table container */
+        padding: 20px; /* Add padding inside the container */
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .custom-table th, .custom-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .custom-table th {
+        background: #007bff;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .custom-table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    .custom-table tr:hover {
+        background: #e9ecef;
+    }
+</style>
+
+
+
+<main class="main">
+    <section class="resume section">
+        <div class="container section-title" data-aos="fade-down">
+            <h2>Scheduled Inteviews</h2>
+            <p>See and edit Scheduled interviews</p>
+        </div>
+        <div class="custom-table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Job title</th>
+                        <th>Pay-Scale</th>
+                        <th>Qualification</th>
+                        <th>Interview Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interview in interviews %}
+                    <tr>
+                        <td>{{interview.interview_post}}</td>
+                        <td>{{interview.interview_pay_scale}}</td>
+                        <td>{{interview.interview_min_quali}}</td>
+                        <td>{{interview.interview_date}}</td>
+                        <td>     <a href="{% url 'edit_interview' interview.interview_id %}" class="view-btn">
+                            &#128065; View
+                        </a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; font-weight: bold; color: #888;">No data available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

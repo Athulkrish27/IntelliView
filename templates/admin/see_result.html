@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interview Results - {{ interview.interview_title }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f9fc;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      color: #004080;
+    }
+
+    h3 {
+      text-align: center;
+      color: #555;
+      margin-bottom: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background-color: #0066cc;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f6fc;
+    }
+
+    img {
+      height: 60px;
+      width: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .resume-link {
+      color: #0066cc;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .btn-select {
+      padding: 0.4rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: default;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-select.not-selected {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    .btn-select.selected {
+      background-color: #28a745;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+    {% if message %}
+    <script>alert("{{message}}")</script>
+    {% endif %}
+
+  <h1>Interview Results</h1>
+  <h3>{{ interview.interview_title }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Candidate Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Resume</th>
+        <th>Photo</th>
+        <th>Score</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for candidate in candidates %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ candidate.applicant_name }}</td>
+        <td>{{ candidate.applicant_email }}</td>
+        <td>{{ candidate.applicant_phone }}</td>
+        <td>
+          {% if candidate.applicant_resume %}
+            <a href="{{ candidate.applicant_resume.url }}" class="resume-link" target="_blank">View</a>
+          {% else %}
+            Not uploaded
+          {% endif %}
+        </td>
+        <td>
+          {% if candidate.applicant_pro_pic %}
+            <img src="{{ candidate.applicant_pro_pic.url }}" alt="Profile" />
+          {% else %}
+            No Photo
+          {% endif %}
+        </td>
+        <td>{{ candidate.interview_score.score_result }}</td>
+        <td>
+            {% if candidate.selected %}
+              <span class="btn-select selected">Selected</span>
+            {% else %}
+              <a
+                href="{% url 'select_candidate' candidate.application_id %}"
+                class="btn-select not-selected"
+                onclick="return confirm('Are you sure you want to select this candidate?');"
+              >
+                Select
+              </a>
+            {% endif %}
+          </td>
+          
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8">No candidates available for this interview.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
